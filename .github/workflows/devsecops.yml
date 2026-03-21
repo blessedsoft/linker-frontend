@@ -1,0 +1,90 @@
+name: DevSecOps Pipeline
+on:
+  pull_request:
+    branches:
+      - main
+    paths-ignore: 
+      - '**/*.md'
+      - '.github/workflows/**'
+
+jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v34
+        with:
+          files: |
+            **/*.js
+            **/*.jsx
+            **/*.ts
+            **/*.tsx
+
+      - name: Run ESLint on changed files
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          npx eslint ${{ steps.changed-files.outputs.added_modified }}
+      
+      - name: Skip linting
+        if: steps.changed-files.outputs.any_changed == 'false'
+        run: echo "No relevant files changed, skipping linting."
+
+  sca:
+    name: Software Composition Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run NPM Audit
+        run: npm audit --json | tee npm-audit-report.json | jq -e 'select(.type=="auditSummary") | select(.data.vulnerabilities.moderate == 0 and .data.vulnerabilities.high == 0 and .data.vulnerabilities.critical == 0)' > /dev/null
+      
+      - name: Upload NPM Audit Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sca-reports
+          path: |
+            reports
+            npm-audit-report.json
+  sast:
+    name: semgrep/ci
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    container:
+      image: semgrep/semrep
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run semgrep
+        run: semgrep scan --error --json-output=semgrep-report.json
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+      
+      - name: Upload semgrep Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semgrep-report
+          path: semgrep-report.json
