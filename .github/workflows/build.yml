@@ -7,7 +7,6 @@ on:
       - main
     paths-ignore: 
       - '**/*.md'
-      - '.github/workflows/**'
 
 env:
   DOCKER_REPO: blessedsoft
