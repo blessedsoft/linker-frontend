@@ -9,8 +9,7 @@ on:
       - '**/*.md'
 
 env:
-  DOCKER_REPO: blessedsoft
-  DOCKER_IMAGE_FRONTEND: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/linker-frontend
+  DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/linker-frontend
 
 jobs:
   build-scan-push:
@@ -35,7 +34,7 @@ jobs:
         id: tag
         uses: docker/metadata-action@v5
         with:
-          images: docker.io/${{ env.DOCKER_IMAGE_FRONTEND }}/${{ env.DOCKER_IMAGE_NAME }}
+          images: ${{ env.DOCKER_IMAGE }}
           tags: |
             type=sha,format=short
       
