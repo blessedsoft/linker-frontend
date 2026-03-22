@@ -7,11 +7,26 @@ on:
       - main
     paths-ignore: 
       - '**/*.md'
+      - '.github/workflows/**'
 
 env:
   DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/linker-frontend
 
 jobs:
+  slack-notify:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Slack Notification
+          uses: rtCamp/action-slack-notify@v2
+          env:
+              SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+              SLACK_TITLE: Docker Build Pipeline Triggered
+              SLACK_MESSAGE: |
+                  **Event:** ${{ github.event_name }}
+                  **Actor:** ${{ github.actor }}
+                  **Branch:** ${{ github.ref_name }}
+                  **Commit:** ${{ github.event.head_commit.message }}
+  
   build-scan-push:
     runs-on: ubuntu-latest
     permissions:
@@ -73,3 +88,15 @@ jobs:
           context: .
           push: true
           tags: ${{ steps.tag.outputs.tags }}
+
+      - name: Slack Notification
+        if: always()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_MESSAGE: |
+              Docker pipeline *${{ job.status }}*
+              Actor: ${{ github.actor }}
+              Repository: ${{ github.repository }}
+              Logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}

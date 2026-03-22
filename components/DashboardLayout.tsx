@@ -35,7 +35,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     if (isLoading) {
         return (
             <div className="w-screen h-screen bg-[#FAFAFA] flex justify-center items-center">
-                <BeatLoader color="#200c6e" size={20} />
+                <BeatLoader color="#9c9aa8" size={20} />
             </div>
         );
     }
