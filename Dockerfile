@@ -17,10 +17,14 @@ FROM base AS runner
 ENV NODE_ENV=production
 EXPOSE 3000
 
-COPY --from=build /app/public ./public
-COPY --from=build /app/.next ./.next
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/package.json ./package.json
-COPY --from=build /app/next.config.mjs ./next.config.mjs
+RUN addgroup -S app && adduser -S -G app app
+
+COPY --from=build --chown=app:app /app/public ./public
+COPY --from=build --chown=app:app /app/.next ./.next
+COPY --from=build --chown=app:app /app/node_modules ./node_modules
+COPY --from=build --chown=app:app /app/package.json ./package.json
+COPY --from=build --chown=app:app /app/next.config.mjs ./next.config.mjs
+
+USER app
 
 CMD ["npm", "start"]
