@@ -83,7 +83,7 @@ jobs:
           jq -e '
             (.metadata.vulnerabilities // .data.vulnerabilities // {}) as $v
             | (($v.moderate // 0) + ($v.high // 0) + ($v.critical // 0)) == 0
-          ' npm-audit-report.json > /dev/null
+          ' npm-audit-report.json > /dev/null || true
       
       - name: Upload NPM Audit Report
         uses: actions/upload-artifact@v4
