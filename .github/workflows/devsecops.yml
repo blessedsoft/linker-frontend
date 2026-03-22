@@ -78,7 +78,12 @@ jobs:
         run: npm install
 
       - name: Run NPM Audit
-        run: npm audit --json | tee npm-audit-report.json | jq -e 'select(.type=="auditSummary") | select(.data.vulnerabilities.moderate == 0 and .data.vulnerabilities.high == 0 and .data.vulnerabilities.critical == 0)' > /dev/null
+        run: |
+          npm audit --json > npm-audit-report.json || true
+          jq -e '
+            (.metadata.vulnerabilities // .data.vulnerabilities // {}) as $v
+            | (($v.moderate // 0) + ($v.high // 0) + ($v.critical // 0)) == 0
+          ' npm-audit-report.json > /dev/null
       
       - name: Upload NPM Audit Report
         uses: actions/upload-artifact@v4
@@ -94,7 +99,7 @@ jobs:
     permissions:
       contents: read
     container:
-      image: semgrep/semrep
+      image: semgrep/semgrep:latest
     steps:
       - uses: actions/checkout@v4
       - name: Run semgrep
