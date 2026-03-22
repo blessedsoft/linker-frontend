@@ -35,7 +35,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     if (isLoading) {
         return (
             <div className="w-screen h-screen bg-[#FAFAFA] flex justify-center items-center">
-                <BeatLoader color="#633CFF" size={20} />
+                <BeatLoader color="#200c6e" size={20} />
             </div>
         );
     }
@@ -76,6 +76,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     )}
                 </div>
                 <div className='flex gap-3 sm:gap-6 my-3 sm:my-6 flex-1 min-h-0'>
+                    c
                     <div className='hidden lg:flex w-[40%] xl:w-[45%]'>
                         <div className='bg-white flex justify-center items-center rounded-xl py-10 xl:py-20 w-full overflow-hidden'>
                             <PhonePreview />
