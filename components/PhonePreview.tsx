@@ -6,9 +6,7 @@ import { socialsObject } from "@/utils/data/data";
 import SocialsCardLink from "./SocialsCardLink";
 import { useProfileRefresh } from "@/providers/ProfileRefreshContext";
 import { useAuth } from "@/providers/AuthProvider";
-
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+import { apiUrl } from "@/lib/api";
 
 type LinkData = {
   platform: string;
@@ -40,8 +38,8 @@ export default function PhonePreview() {
       setError(null);
 
       const [profileRes, linksRes] = await Promise.all([
-        fetch(`${API_BASE}/profile/${user.id}`),
-        fetch(`${API_BASE}/links/${user.id}`),
+        fetch(apiUrl(`/profile/${user.id}`)),
+        fetch(apiUrl(`/links/${user.id}`)),
       ]);
 
       const profileJson = await profileRes.json();
