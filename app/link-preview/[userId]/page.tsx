@@ -7,15 +7,14 @@ import React from "react";
 import { FaCircle } from "react-icons/fa6";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+import { apiUrl } from "@/lib/api";
 
 type Params = { params: Promise<{ userId: string }> };
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { userId } = await params;
   try {
-    const res = await fetch(`${API_BASE}/profile/${userId}`, { cache: "no-store" });
+    const res = await fetch(apiUrl(`/profile/${userId}`), { cache: "no-store" });
     const profileResult = await res.json();
     if (!profileResult.success || !profileResult.profileData) {
       return { title: "User Not Found", description: "The requested user profile could not be found." };
@@ -47,8 +46,8 @@ export default async function Page({ params }: Params) {
 
   try {
     const [profileRes, linksRes] = await Promise.all([
-      fetch(`${API_BASE}/profile/${userId}`, { cache: "no-store" }),
-      fetch(`${API_BASE}/links/${userId}`, { cache: "no-store" }),
+      fetch(apiUrl(`/profile/${userId}`), { cache: "no-store" }),
+      fetch(apiUrl(`/links/${userId}`), { cache: "no-store" }),
     ]);
     profileResult = await profileRes.json();
     linksResult = await linksRes.json();

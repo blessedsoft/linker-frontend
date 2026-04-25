@@ -10,8 +10,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { useProfileRefresh } from "@/providers/ProfileRefreshContext";
 import { toast } from "sonner";
 import { BeatLoader, ClipLoader } from "react-spinners";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+import { apiUrl } from "@/lib/api";
 
 interface LinkData {
   platform: string;
@@ -37,7 +36,7 @@ function LinkContent() {
     }
     (async () => {
       try {
-        const res = await fetch(`${API_BASE}/links/${user.id}`);
+        const res = await fetch(apiUrl(`/links/${user.id}`));
         const result = await res.json();
         if (result.success && result.links?.length > 0) {
           const validLinks = result.links.filter((l: { platform?: string; url?: string }) => l.platform && l.url);
@@ -121,7 +120,7 @@ function LinkContent() {
 
     startTransition(async () => {
       try {
-        const res = await fetch(`${API_BASE}/links`, {
+        const res = await fetch(apiUrl("/links"), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

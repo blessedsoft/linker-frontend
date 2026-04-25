@@ -10,8 +10,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { useProfileRefresh } from "@/providers/ProfileRefreshContext";
 import { toast } from "sonner";
 import { ClipLoader } from "react-spinners";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+import { apiUrl } from "@/lib/api";
 const MAX_FILE_SIZE = 1024 * 1024 * 4; // 4MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
@@ -39,7 +38,7 @@ export default function Profile() {
     if (!user?.id || !token) return;
     (async () => {
       try {
-        const res = await fetch(`${API_BASE}/profile/${user.id}`);
+        const res = await fetch(apiUrl(`/profile/${user.id}`));
         const data = await res.json();
         if (data.success && data.profileData) {
           const p = data.profileData;
@@ -87,7 +86,7 @@ export default function Profile() {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const response = await axios.post(`${API_BASE}/upload-image`, formData, {
+      const response = await axios.post(apiUrl("/upload-image"), formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setImageUrl(response.data.url);
@@ -113,7 +112,7 @@ export default function Profile() {
           return;
         }
         try {
-          const res = await fetch(`${API_BASE}/profile`, {
+          const res = await fetch(apiUrl("/profile"), {
             method: "PATCH",
             headers: {
               "Content-Type": "application/json",
